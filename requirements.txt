@@ -13,4 +13,5 @@ numpy
 pandas
 matplotlib
 seaborn
-
+statsmodels
+plotnine

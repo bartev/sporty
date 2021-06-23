@@ -1,0 +1,8 @@
+* Data sources
+* gl2018.zip
+** https://www.retrosheet.org/gamelogs/index.html
+** column descriptions: file:glfields.txt
+** Headers
+*** file:retrosheet-gamelog-header.txt
+*** https://www.reddit.com/r/Sabermetrics/comments/3rui4y/retrosheet_game_log_header/ 
+https://raw.githubusercontent.com/maxtoki/baseball_R/master/data/game_log_header.csv
