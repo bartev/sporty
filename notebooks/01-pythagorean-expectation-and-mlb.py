@@ -54,6 +54,8 @@ from plotnine import ggplot, aes, facet_wrap
 
 # # Read data
 
+# Get the data from https://www.retrosheet.org
+
 # In[3]:
 
 
