@@ -75,67 +75,33 @@ get_ipython().system('pip install openpyxl')
 # ## archive
 # 
 # 2008-2017
-
-# In[52]:
-
-
 data_dir = Path('/Users/bartev/dev/github-bv/sporty/data/raw/wk1-IPL/archive')
 matches = pd.read_csv(data_dir / 'matches.csv')
 
-deliveries = pd.read_csv(data_dir / 'deliveries.csv')
-
-
-# In[53]:
-
-
-deliveries.head()
-
-
-# In[54]:
-
-
-matches.groupby('season').size()
-
-
+deliveries = pd.read_csv(data_dir / 'deliveries.csv')deliveries.head()matches.groupby('season').size()
 # ## archive 2
 # 2008 - 2019
-
-# In[55]:
-
-
 data_dir2 = Path('/Users/bartev/dev/github-bv/sporty/data/raw/wk1-IPL/archive 2')
 matches2 = pd.read_csv(data_dir2 / 'matches.csv')
-deliveries2 = pd.read_csv(data_dir2 / 'deliveries.csv')
-
-
-# In[56]:
-
-
-matches2.groupby('season').size()
-
-
-# In[57]:
-
-
-deliveries2
-
-
+deliveries2 = pd.read_csv(data_dir2 / 'deliveries.csv')matches2.groupby('season').size()deliveries2
 # ## archive-3
+# 
+# I found this data somewhere on Kaggle (didn't keep the link
 # 
 # More data than `archive 2`?
 
-# In[67]:
+# In[157]:
 
 
 data_dir = Path('/Users/bartev/dev/github-bv/sporty/data/raw/wk1-IPL/archive-3')
 matches = pd.read_csv(data_dir3 / 'matches.csv')
 deliveries = pd.read_csv(data_dir3/ 'deliveries.csv')
 teams = pd.read_csv(data_dir3 / 'teams.csv')
-teamwise = pd.read_csv(data_dir3 / 'teamwise_home_and_away.csv').head()
-players = pd.read_excel(data_dir3 / 'Players.xlsx').head()
+teamwise = pd.read_csv(data_dir3 / 'teamwise_home_and_away.csv')
+players = pd.read_excel(data_dir3 / 'Players.xlsx')
 
 
-# In[62]:
+# In[158]:
 
 
 matches.groupby('Season').size()
@@ -153,21 +119,19 @@ deliveries.head()
 matches.head(2)
 
 
-# In[65]:
+# In[159]:
 
 
-teamwise.head()
+teamwise
 
 
-# In[72]:
+# In[ ]:
 
 
-ipl18 = (matches
-         .query("Season == 'IPL-2018'")
-        .assign(hwin=lambda x: np.where(x['team1'] == x['winner'], 1,0),
-                awin=lambda x: np.where(x['team2'] == x['winner'], 1,0),
-#                 htruns=lambda x: np.where(x['team1'] == x[''])
-               )
+ipl18 = matches.query("Season == 'IPL-2018'").assign(
+    hwin=lambda x: np.where(x["team1"] == x["winner"], 1, 0),
+    awin=lambda x: np.where(x["team2"] == x["winner"], 1, 0),
+    #                 htruns=lambda x: np.where(x['team1'] == x[''])
 )
 ipl18
 
@@ -188,19 +152,6 @@ match_team_runs = (
     .rename(columns={"match_id": "id"})
 )
 match_team_runs.head(5)
-
-(deliveries[['match_id', 'inning', 'batting_team', 'bowling_team', 'total_runs']]
-.merge(ipl18[['id', 'Season', 'team1', 'team2', 'winner', 'win_by_runs', 'win_by_wickets']], left_on='match_id', right_on='id')
-.shape
-)
-# In[113]:
-
-
-tmp = (ipl18
-#  .head()
-[['id', 'Season', 'date', 'team1', 'team2', 'winner', 'win_by_runs', 'win_by_wickets', 'hwin', 'awin']]
-)
-tmp
 
 
 # In[133]:
