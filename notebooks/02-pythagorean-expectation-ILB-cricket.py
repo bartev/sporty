@@ -86,7 +86,7 @@ matches2 = pd.read_csv(data_dir2 / 'matches.csv')
 deliveries2 = pd.read_csv(data_dir2 / 'deliveries.csv')matches2.groupby('season').size()deliveries2
 # ## archive-3
 # 
-# I found this data somewhere on Kaggle (didn't keep the link
+# I found this data somewhere on Kaggle (didn't keep the link)
 # 
 # More data than `archive 2`?
 

@@ -35,3 +35,5 @@ import matplotlib.pyplot as plt
 
 import plotnine as p9
 from plotnine import ggplot, aes, facet_wrap
+
+from src.utils import lower_case_col_names
