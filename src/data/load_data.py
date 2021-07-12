@@ -135,6 +135,11 @@ def load_nba_games_dataset():
         .merge(deets)
         .dropna()
         .sort_values(['game_date_est', 'game_id'])
+        .assign(game_id=lambda x: x['game_id'].apply(str))
+        .assign(season=lambda x: x['season'].apply(int))
+        .assign(season=lambda x: x['home_team_wins'].apply(int))
+        .assign(team_id=lambda x: x['team_id'].apply(str))
+        .rename(columns={'game_date_esg': 'game_date'})
     )
 
     return res
