@@ -3,7 +3,7 @@
 
 # # Week 1 - Pythangorean Expectation & English Football
 
-# In[7]:
+# In[1]:
 
 
 # %load ./imports.py
@@ -52,7 +52,7 @@ from src.utils import lower_case_col_names
 # 
 # Download from https://fbref.com/en/comps/9/1631/2017-2018-Premier-League-Stats
 
-# In[13]:
+# In[2]:
 
 
 data_dir = Path('../data/raw/wk1-english-football/')
@@ -61,7 +61,7 @@ data = pd.read_csv(data_dir / 'season-1718.csv').pipe(lower_case_col_names)
 data = pd.read_csv(data_dir / 'england.csv')
 
 
-# In[14]:
+# In[3]:
 
 
 data
@@ -83,7 +83,7 @@ data.query("Season == 2017").head()
 # 
 # 1: English Premier League
 
-# In[33]:
+# In[4]:
 
 
 cols = ["Date", "Season", "home", "visitor", "hgoal", "vgoal", "division", "result"]
@@ -130,7 +130,7 @@ engl_17_long
 
 # ## Continue with wide data
 
-# In[65]:
+# In[36]:
 
 
 engl_home = (
@@ -150,7 +150,7 @@ engl_home = (
 engl_home
 
 
-# In[69]:
+# In[37]:
 
 
 engl_away = (
@@ -169,7 +169,7 @@ engl_away = (
 engl_away
 
 
-# In[77]:
+# In[38]:
 
 
 # GF - goals scores
@@ -211,6 +211,177 @@ pyth_lm.summary()
 # # Questions
 
 # Can we use Pythagorean Expectation to predict the outcome of a game?
+
+# # Quiz
+
+# How many EPL games were played in 2018 (from 2017-18 season)
+
+# In[18]:
+
+
+(engl_17
+# .head()
+ .query("Date.str.startswith('2018')")
+ .query("division == 1")
+ .shape
+)
+
+
+# Which team scored the highest number of goals while playing at home in the first half of the season?
+# 
+# (division 1?)
+
+# In[34]:
+
+
+engl_17.head()
+
+
+# In[33]:
+
+
+(
+    engl_17.assign(
+        half=lambda x: np.where(
+            x["Date"].str.startswith("2017"),
+            2017,
+            np.where(x["Date"].str.startswith("2018"), 2018, 999),
+        )
+    )
+    .query("division == 1")
+    .query("half == 2017")
+    .groupby('home')
+    .agg({'hgoal': np.sum})
+#     ['hgoal'].sum()
+    .sort_values('hgoal', ascending=False)
+#     .groupby('half')
+)
+
+
+# Which team conceded the highest number of goals while playing away in the first half of the season?
+
+# In[35]:
+
+
+(
+    engl_17.assign(
+        half=lambda x: np.where(
+            x["Date"].str.startswith("2017"),
+            2017,
+            np.where(x["Date"].str.startswith("2018"), 2018, 999),
+        )
+    )
+    .query("division == 1")
+    .query("half == 2017")
+    .groupby('visitor')
+    .agg({'hgoal': np.sum})
+    .sort_values('hgoal', ascending=False)
+)
+
+
+# Which of the following teams had the smallest difference between their win percentage and Pythagorean expectation in the first half of the season?
+
+# In[42]:
+
+
+engl_home_half = (
+    engl_17.assign(
+        half=lambda x: np.where(
+            x["Date"].str.startswith("2017"),
+            2017,
+            np.where(x["Date"].str.startswith("2018"), 2018, 999),
+        )
+    )
+    .groupby(["half", "home", "division"])["count", "hwin", "hgoal", "vgoal"]
+    .sum()
+    .reset_index()
+    .rename(
+        columns={
+            "home": "team",
+            "count": "Ph",
+            "hgoal": "FTHGh",
+            "vgoal": "FTAGh",
+#             'hwin': 'hwinvalue'
+        }
+    )
+)
+engl_home_half
+
+
+# In[43]:
+
+
+engl_away_half = (
+    engl_17.assign(
+        half=lambda x: np.where(
+            x["Date"].str.startswith("2017"),
+            2017,
+            np.where(x["Date"].str.startswith("2018"), 2018, 999),
+        )
+    )
+    .groupby(["half", "visitor"])["count", "awin", "hgoal", "vgoal"]
+    .sum()
+    .reset_index()
+    .rename(
+        columns={
+            "visitor": "team",
+            "count": "Pa",
+            "hgoal": "FTHGa",
+            "vgoal": "FTAGa",
+        }
+    )
+)
+engl_away_half
+
+
+# In[45]:
+
+
+# GF - goals scores
+# GA - goals conceded
+
+engl_summary_half = (
+    engl_home_half.merge(engl_away_half, on=["team", "half"])
+    .query("division == 1")
+    .assign(
+        W=lambda x: x["hwin"] + x["awin"],
+        G=lambda x: x["Ph"] + x["Pa"],
+        GF=lambda x: x["FTHGh"] + x["FTAGa"],
+        GA=lambda x: x["FTAGh"] + x["FTHGa"],
+    )
+    .assign(
+        wpc=lambda x: x["W"] / x["G"],
+        pyth=lambda x: x["GF"] ** 2 / (x["GF"] ** 2 + x["GA"] ** 2),
+    )
+)
+engl_summary_half
+
+
+# In[ ]:
+
+
+engl_summary_half.query("half == 2017").assign(
+    delta=lambda x: abs(x["pyth"] - x["wpc"])
+).sort_values("delta")
+
+
+# In[52]:
+
+
+(engl_summary_half.query("half == 2018").assign(
+    delta=lambda x: abs(x["hwin"] - x["awin"])
+).sort_values("delta"))
+
+
+# In[60]:
+
+
+cols = ['team', 'wpc', 'pyth']
+(engl_summary_half.query("half == 2017")[cols]
+.merge(engl_summary_half.query("half == 2018")[cols],
+      on=["team"], suffixes=["_1", "_2"])
+.corr())
+
 
 # In[ ]:
 

@@ -37,3 +37,5 @@ import plotnine as p9
 from plotnine import ggplot, aes, facet_wrap
 
 from src.utils import lower_case_col_names
+import src.data.load_data as ld
+from src.data.load_data import get_nba_game_team_points, load_nba
