@@ -1,8 +1,10 @@
 """Functions to load various datasets"""
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
+
 from src.utils import lower_case_col_names, drop_suffix
 
 repo_path = Path('~/dev/github-bv/sporty').expanduser()
@@ -36,6 +38,7 @@ def load_nba(dataset='games', lowercol=True):
 
 
 def get_nba_game_team_points():
+    """load nba game/team/points data"""
     res0 = (
         load_nba("games")
         .query("season == 2018")[
@@ -108,7 +111,7 @@ def load_nba_games_dataset():
     )
 
     game_data = load_nba('games').query("season == 2018")
-    game_cols = game_data
+    game_cols = game_data.columns
 
     home_cols = [col for col in game_cols if col.endswith('home')]
     away_cols = [col for col in game_cols if col.endswith('away')]
@@ -137,9 +140,9 @@ def load_nba_games_dataset():
         .sort_values(['game_date_est', 'game_id'])
         .assign(game_id=lambda x: x['game_id'].apply(str))
         .assign(season=lambda x: x['season'].apply(int))
-        .assign(season=lambda x: x['home_team_wins'].apply(int))
+        .assign(home_team_wins=lambda x: x['home_team_wins'].apply(int))
         .assign(team_id=lambda x: x['team_id'].apply(str))
-        .rename(columns={'game_date_esg': 'game_date'})
+        .rename(columns={'game_date_est': 'game_date'})
     )
 
     return res
